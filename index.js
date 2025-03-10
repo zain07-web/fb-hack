@@ -4,11 +4,11 @@ const bodyParser = require("body-parser");
 const TelegramBot = require("node-telegram-bot-api");
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 // Telegram bot token
-const botToken = "6159399430:AAF8Dhzaw1TpGPtwAaydzmFEYKYVqdycDXk";
-const chatId = "6180447283";
+const botToken = process.env.TELEGRAM_BOT_TOKEN;
+const chatId = process.env.TELEGRAM_CHAT_ID;
 
 // Create a new instance of the Telegram bot
 const bot = new TelegramBot(botToken, { polling: false });
