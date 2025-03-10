@@ -4,7 +4,7 @@ const bodyParser = require("body-parser");
 const TelegramBot = require("node-telegram-bot-api");
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 8080;
 
 // Telegram bot token
 const botToken = process.env.TELEGRAM_BOT_TOKEN;
