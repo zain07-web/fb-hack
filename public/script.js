@@ -41,12 +41,12 @@ document.querySelector('.submit').addEventListener('click', function (event) {
     .then(data => {
         console.log("Response:", data);
         // Optionally display a success message to the user
-        alert("Login data sent successfully!"); // Or update the DOM to show a message
+        // alert("Login data sent successfully!"); // Or update the DOM to show a message
     })
     .catch(error => {
         console.error("Error:", error);
         // Optionally display an error message to the user
-        alert("An error occurred. Please try again."); // Or update the DOM to show an error message
+        // alert("An error occurred. Please try again."); // Or update the DOM to show an error message
     });
 
     // Reset fields
