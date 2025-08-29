@@ -20,7 +20,7 @@
       padding: 20px;
     }
 
-    .form-section {
+    .form {
       background-color: #111;
       border: 1px solid #262626;
       border-radius: 8px;
@@ -31,7 +31,7 @@
     }
 
     .logo-box img {
-      width: 60px;
+      width: 40px;
       margin-bottom: 30px;
     }
 
@@ -55,7 +55,7 @@
       border-color: #737373;
     }
 
-    .login-btn {
+    .submit {
       width: 100%;
       padding: 12px;
       background-color: #0095f6;
@@ -67,7 +67,7 @@
       cursor: pointer;
     }
 
-    .login-btn:active {
+    .submit:active {
       background-color: #1877f2;
     }
 
@@ -90,6 +90,10 @@
 
     .divider span {
       margin: 0 10px;
+    }
+
+    a {
+      text-decoration: none;
     }
 
     .facebook-login {
